@@ -1,9 +1,10 @@
 import type StableBirr from "@tolbel/sbirr";
+import type { AllowanceValue } from "@tolbel/sbirr";
 
 export async function configureMinter(
   sbirr: StableBirr,
   minter: string,
-  allowance: string,
+  allowance: AllowanceValue,
   canBurn: boolean
 ) {
   const result = await sbirr.contract.configureMinter({

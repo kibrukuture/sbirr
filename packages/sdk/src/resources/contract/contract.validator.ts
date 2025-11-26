@@ -102,7 +102,7 @@ export const SetSupplyCapParamsSchema = z.object({
 
 export const ConfigureMinterParamsSchema = z.object({
   minter: AddressSchema,
-  allowance: AmountSchema,
+  allowance: z.union([z.literal("max"), AmountSchema]),
   canBurn: z.boolean(),
 });
 
