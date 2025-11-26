@@ -1,0 +1,15 @@
+node_modules/
+typechain-types
+artifacts
+cache
+dist
+coverage
+.env
+gas-report.txt
+.DS_Store
+
+sdk/dist
+contracts/artifacts
+contracts/cache
+nbe-proposal.md
+hi.md

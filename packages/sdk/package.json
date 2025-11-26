@@ -1,0 +1,41 @@
+{
+  "name": "@tolbel/sbirr",
+  "version": "0.0.8",
+  "description": "StableBirr SDK - Ethiopian Birr stablecoin",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "stablebirr",
+    "sbirr",
+    "ethiopia",
+    "ethiopian-birr",
+    "stablecoin",
+    "nbe",
+    "polygon"
+  ],
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run copy:types && tsc && tsc-alias",
+    "copy:types": "rm -rf src/typechain-types && cp -r ../contracts/typechain-types src/",
+    "clean": "rm -rf dist src/typechain-types",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ethers": "^6.15.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.9.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kibrukuture/StableBirr"
+  },
+  "author": "Schnl (tolbel LLC)",
+  "license": "MIT"
+}
