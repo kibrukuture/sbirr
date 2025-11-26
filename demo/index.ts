@@ -20,10 +20,8 @@ const recipient = process.env.METAMASK_ADDRESS!;
 
 async function main() {
   try {
-    // const balance = await sbirr.contract.getBalance(
-    //   "0x0b44c56e29107b0964b3923f059ee64cc6d8041a"
-    // );
-    // console.log({ balance });
+    const calculateEtbAmount = sbirr.utils.calculateEtbAmount(100, 150);
+    console.log({ calculateEtbAmount });
     // const freezeResult = await sbirr.contract.isFrozen(
     //   "0x0b44c56e29107b0964b3923f059ee64cc6d8041a"
     // );
@@ -73,14 +71,13 @@ async function main() {
     //   "Test complete"
     // );
     // console.log({ unfreeze: unfreezeResult });
-    const configureResult = await configureMinter(
-      sbirr,
-      recipient,
-      "max",
-      true
-    );
-    console.log({ configureMinter: configureResult });
-
+    // const configureResult = await configureMinter(
+    //   sbirr,
+    //   recipient,
+    //   "max",
+    //   true
+    // );
+    // console.log({ configureMinter: configureResult });
     // const removeResult = await removeMinter(sbirr, recipient);
     // console.log({ removeMinter: removeResult });
   } catch (error) {
