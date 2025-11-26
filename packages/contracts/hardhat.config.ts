@@ -50,6 +50,7 @@ const config: HardhatUserConfig = {
       chainId: 80002,
       gasPrice: "auto",
     },
+
     polygon: {
       url: process.env.POLYGON_RPC_URL || "https://polygon-rpc.com",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
@@ -67,10 +68,7 @@ const config: HardhatUserConfig = {
   },
 
   etherscan: {
-    apiKey: {
-      polygon: process.env.POLYGONSCAN_API_KEY || "",
-      polygonAmoy: process.env.POLYGONSCAN_API_KEY || "",
-    },
+    apiKey: process.env.ETHERSCAN_API_KEY || "",
   },
 
   paths: {
