@@ -185,17 +185,23 @@ export interface SetSupplyCapParams {
 }
 
 /**
+ * Allowance value for minter configuration.
+ * Use "max" for unlimited allowance, or a numeric string for a specific amount in SBirr tokens.
+ */
+export type AllowanceValue = "max" | (string & {});
+
+/**
  * Parameters for configuring or updating an authorized minter.
  *
  * The SDK expects the allowance in human-readable token units (e.g., "1000000" for 1M SBirr). It
- * handles conversion to wei before invoking the contract. Set `allowance` to a very large number
- * (or `"max"`, handled upstream) only if this minter should have effectively unlimited authority.
+ * handles conversion to wei before invoking the contract. Set `allowance` to `"max"` for unlimited
+ * authority, or provide a numeric string for a specific amount.
  */
 export interface ConfigureMinterParams {
   /** Address to authorize as a minter */
   minter: string;
-  /** Allowance expressed in human-readable SBirr (string) */
-  allowance: string;
+  /** Allowance: use "max" for unlimited, or a numeric string (e.g., "1000000") */
+  allowance: AllowanceValue;
   /** Whether this minter is also allowed to initiate burn flows */
   canBurn: boolean;
   /** Optional transaction overrides */

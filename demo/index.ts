@@ -1,4 +1,4 @@
-import StableBirr from "@tolbel/sbirr";
+import StableBirr, { ethers } from "@tolbel/sbirr";
 import { mint } from "./funs/mint";
 import { burn } from "./funs/burn";
 import { transfer } from "./funs/transfer";
@@ -28,11 +28,11 @@ async function main() {
     //   "0x0b44c56e29107b0964b3923f059ee64cc6d8041a"
     // );
     // console.log({ freezeResult });
-    const wipeFrozenBalance = await sbirr.contract.wipeFrozenBalance({
-      account: "0x0b44c56e29107b0964b3923f059ee64cc6d8041a",
-      caseId: "MERCHANT_001",
-    });
-    console.log({ wipeFrozenBalance });
+    // const wipeFrozenBalance = await sbirr.contract.wipeFrozenBalance({
+    //   account: "0x0b44c56e29107b0964b3923f059ee64cc6d8041a",
+    //   caseId: "MERCHANT_001",
+    // });
+    // console.log({ wipeFrozenBalance });
     // // Test mint
     // const mintResult = await mint(sbirr, recipient);
     // console.log({ mint: mintResult });
@@ -73,10 +73,15 @@ async function main() {
     //   "Test complete"
     // );
     // console.log({ unfreeze: unfreezeResult });
-    // const configureResult = await configureMinter(sbirr, "0x0000000000000000000000000000000000000004", "1000", true);
-    // console.log({ configureMinter: configureResult });
-    //
-    // const removeResult = await removeMinter(sbirr, "0x0000000000000000000000000000000000000004");
+    const configureResult = await configureMinter(
+      sbirr,
+      recipient,
+      "max",
+      true
+    );
+    console.log({ configureMinter: configureResult });
+
+    // const removeResult = await removeMinter(sbirr, recipient);
     // console.log({ removeMinter: removeResult });
   } catch (error) {
     console.log({ error });
