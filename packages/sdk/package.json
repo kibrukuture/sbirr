@@ -1,6 +1,6 @@
 {
   "name": "@tolbel/sbirr",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "StableBirr SDK - Ethiopian Birr stablecoin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -34,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kibrukuture/sbirr"
+    "url": "https://github.com/kibrukuture/sbirr/tree/main/packages/sdk"
   },
   "author": "Schnl (tolbel LLC)",
   "license": "MIT"
