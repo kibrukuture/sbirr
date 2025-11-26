@@ -467,75 +467,6 @@ export class StableBirrContract {
   }
 
   /**
-   * Update the FX oracle contract. Use this whenever governance migrates from a sandbox feed to
-   * production or rotates to a new Chainlink deployment after an upgrade.
-   */
-  public async updateFxOracle(
-    params: UpdateOracleParams
-  ): Promise<ethers.TransactionResponse> {
-    if (!this.signer)
-      throw new ValidationError("Signer required for oracle update");
-
-    const validation = UpdateOracleParamsSchema.safeParse(params);
-    if (!validation.success) {
-      throw new ValidationError("Invalid oracle parameters", validation.error);
-    }
-
-    return AdminHandler.updateFxOracle(this.contract, this.signer, params);
-  }
-
-  /**
-   * Configure the allowed deviation between operator input and the oracle rate. This keeps the mint
-   * desk honest by requiring their manually observed rate to sit within a bounded distance of the
-   * authoritative oracle feed.
-   */
-  public async setRateDeviationTolerance(
-    params: SetRateToleranceParams
-  ): Promise<ethers.TransactionResponse> {
-    if (!this.signer)
-      throw new ValidationError("Signer required for rate tolerance update");
-
-    const validation = SetRateToleranceParamsSchema.safeParse(params);
-    if (!validation.success) {
-      throw new ValidationError(
-        "Invalid tolerance parameters",
-        validation.error
-      );
-    }
-
-    return AdminHandler.setRateDeviationTolerance(
-      this.contract,
-      this.signer,
-      params
-    );
-  }
-
-  /**
-   * Configure how long oracle data stays valid before minting halts. Use this to avoid issuing
-   * tokens off stale FX data when the oracle stalls or loses quorum.
-   */
-  public async setOracleStalePeriod(
-    params: SetOracleStalePeriodParams
-  ): Promise<ethers.TransactionResponse> {
-    if (!this.signer)
-      throw new ValidationError("Signer required for stale period update");
-
-    const validation = SetOracleStalePeriodParamsSchema.safeParse(params);
-    if (!validation.success) {
-      throw new ValidationError(
-        "Invalid stale period parameters",
-        validation.error
-      );
-    }
-
-    return AdminHandler.setOracleStalePeriod(
-      this.contract,
-      this.signer,
-      params
-    );
-  }
-
-  /**
    * Update the circulating supply cap (0 disables the guard). Operations typically set this to the
    * latest attested fiat reserves so the contract itself enforces the reserve ratio.
    */
@@ -650,19 +581,6 @@ export class StableBirrContract {
       return await this.contract.isFrozen(address);
     } catch (error: unknown) {
       throw new ContractError("Failed to check freeze status", error);
-    }
-  }
-
-  /**
-   * Fetch the latest oracle-derived FX rate (as a string scaled to 18 decimals). Use this when
-   * building dashboards or reconciliation scripts that need to display the real-time peg.
-   */
-  public async currentOracleRate(): Promise<string> {
-    try {
-      const rate = await this.contract.currentOracleRate();
-      return rate.toString();
-    } catch (error: unknown) {
-      throw new ContractError("Failed to fetch oracle rate", error);
     }
   }
 

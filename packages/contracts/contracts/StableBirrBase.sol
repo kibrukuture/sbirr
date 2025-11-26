@@ -7,7 +7,6 @@ import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IStableBirr.sol";
-import "./interfaces/IPriceFeed.sol";
 import "./access/SchnlControlledUpgradeable.sol";
 import "./libraries/Conversion.sol";
 
@@ -85,26 +84,8 @@ abstract contract StableBirrBase is
     mapping(address => MinterConfig) internal _minters;
 
     // -------------------------------------------------------------------------
-    // --------------------------- Oracle & Supply -----------------------------
+    // ----------------------------- Supply Cap --------------------------------
     // -------------------------------------------------------------------------
-
-    /// @notice External FX oracle surfacing the authoritative USD/ETB rate (e.g., Chainlink).
-    IPriceFeed public fxOracle;
-
-    /**
-     * @notice Maximum deviation (in basis points) tolerated between the Schnl operator’s
-     *         supplied rate and the oracle rate.
-     * @dev Defaults to 1% (100 bps). Setting to 0 requires an exact match, setting to 10_000
-     *      tolerates 100% deviation. Guards against manual data entry mistakes.
-     */
-    uint256 public rateDeviationToleranceBps;
-
-    /**
-     * @notice Maximum allowable age (seconds) of oracle answers before mints halt.
-     * @dev Prevents issuing tokens based on stale FX data. When set to zero the staleness
-     *      check is disabled (useful for testing or when the oracle provides liveness guards).
-     */
-    uint256 public oracleStalePeriod;
 
     /**
      * @notice Maximum circulating supply allowed. Zero disables the cap.
@@ -113,18 +94,6 @@ abstract contract StableBirrBase is
      *      refuses to exceed the cap.
      */
     uint256 public supplyCap;
-
-    /// @notice Cached oracle decimals for scaling the feed answer into 18 decimals.
-    uint8 internal _oracleDecimals;
-
-    /// @notice Snapshot of the last oracle rate used during mint operations (scaled to 18 decimals).
-    uint256 public lastOracleRate;
-
-    /// @notice Timestamp reported by the oracle for `lastOracleRate`. Useful for dashboards.
-    uint256 public oracleLastUpdatedAt;
-
-    /// @notice Denominator used when dealing with basis points math.
-    uint256 internal constant BPS_DENOMINATOR = 10_000;
 
     // -------------------------------------------------------------------------
     // ------------------------------ Structs ---------------------------------
@@ -183,14 +152,7 @@ abstract contract StableBirrBase is
     error AccountAlreadyFrozen(address account);
     error AccountNotFrozen(address account);
     error IncidentReasonRequired();
-    error AmountMismatch(uint256 expected, uint256 provided);
     error SupplyCapExceeded(uint256 cap, uint256 attempted);
-    error OracleNotConfigured();
-    error OracleRateInvalid();
-    error OracleStale();
-    error RateToleranceExceeded(uint256 oracleRate, uint256 providedRate);
-    error InvalidTolerance();
-    error OracleDecimalsNotSet();
     error NotAuthorizedMinter(address account);
     error MintAllowanceExceeded(address account, uint256 allowance, uint256 requested);
 
@@ -233,10 +195,6 @@ abstract contract StableBirrBase is
         __Pausable_init();
         __ReentrancyGuard_init();
         __SchnlControlled_init(admin, operator);
-
-        // Set default oracle parameters
-        rateDeviationToleranceBps = 100; // 1%
-        oracleStalePeriod = 3600; // 1 hour
 
         _pause();
 
@@ -338,6 +296,15 @@ abstract contract StableBirrBase is
         }
         MinterConfig storage config = _minters[account];
         return config.active && config.canBurn;
+    }
+
+    /**
+     * @notice Configure maximum circulating supply (0 disables enforcement).
+     * @param newCap New max supply in wei.
+     */
+    function setSupplyCap(uint256 newCap) external override onlySchnlAdmin {
+        supplyCap = newCap;
+        emit SupplyCapUpdated(newCap);
     }
 
     uint256[25] private __stablebirr_gap;

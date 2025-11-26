@@ -60,18 +60,6 @@ abstract contract StableBirrOperations is StableBirrCompliance {
         if (_blacklisted[to]) revert AccountBlacklisted(to);
         if (_frozen[to]) revert AccountFrozenState(to);
 
-        (uint256 oracleRate, uint256 oracleTimestamp) = _fetchOracleRate();
-        Conversion.validateRate(oracleRate);
-
-        if (!_withinRateTolerance(oracleRate, rate)) {
-            revert RateToleranceExceeded(oracleRate, rate);
-        }
-
-        uint256 expectedAmount = Conversion.calculateEtbAmount(usdAmount, oracleRate);
-        if (amount != expectedAmount) {
-            revert AmountMismatch(expectedAmount, amount);
-        }
-
         if (supplyCap != 0) {
             uint256 newSupply = totalSupply() + amount;
             if (newSupply > supplyCap) {
@@ -80,14 +68,14 @@ abstract contract StableBirrOperations is StableBirrCompliance {
         }
 
         bytes32 recordId = keccak256(
-            abi.encodePacked(to, amount, usdAmount, oracleRate, block.timestamp)
+            abi.encodePacked(to, amount, usdAmount, rate, block.timestamp)
         );
 
         mintRecords[recordId] = MintRecord({
             to: to,
             amount: amount,
             usdAmount: usdAmount,
-            rate: oracleRate,
+            rate: rate,
             timestamp: block.timestamp,
             exists: true
         });
@@ -96,10 +84,7 @@ abstract contract StableBirrOperations is StableBirrCompliance {
         _mint(to, amount);
         _consumeMintAllowance(msg.sender, amount);
 
-        lastOracleRate = oracleRate;
-        oracleLastUpdatedAt = oracleTimestamp;
-
-        emit Minted(to, amount, usdAmount, oracleRate, block.timestamp);
+        emit Minted(to, amount, usdAmount, rate, block.timestamp);
     }
 
     /**

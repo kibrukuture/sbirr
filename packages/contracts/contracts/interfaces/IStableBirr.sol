@@ -65,28 +65,10 @@ interface IStableBirr is IERC20, IERC20Metadata {
     event Rescued(address indexed token, address indexed to, uint256 amount);
 
     /**
-     * @notice Emitted when the FX oracle address changes
-     * @param oracle New oracle contract
-     */
-    event FxOracleUpdated(address indexed oracle);
-
-    /**
-     * @notice Emitted when the acceptable deviation vs oracle is updated
-     * @param toleranceBps New tolerance expressed in basis points
-     */
-    event RateToleranceUpdated(uint256 toleranceBps);
-
-    /**
      * @notice Emitted when the maximum circulating supply is updated
      * @param newCap New cap in SBirr (18 decimals). Zero disables the cap.
      */
     event SupplyCapUpdated(uint256 newCap);
-
-    /**
-     * @notice Emitted when the oracle stale period is updated
-     * @param newPeriod New allowable staleness (seconds)
-     */
-    event OracleStalePeriodUpdated(uint256 newPeriod);
 
     /**
      * @notice Emitted when an address is frozen for compliance reasons
@@ -272,39 +254,10 @@ interface IStableBirr is IERC20, IERC20Metadata {
     function isFrozen(address account) external view returns (bool);
 
     /**
-     * @notice Update the FX oracle address.
-     * @dev Must point to a contract implementing `IPriceFeed` (e.g., Chainlink aggregator).
-     * @param newOracle Address of the new oracle.
-     */
-    function updateFxOracle(address newOracle) external;
-
-    /**
-     * @notice Configure acceptable deviation between operator-provided rate and oracle (in bps).
-     * @param toleranceBps Basis points tolerance (e.g., 100 = 1%). Must be <= 10_000.
-     */
-    function setRateDeviationTolerance(uint256 toleranceBps) external;
-
-    /**
-     * @notice Set how old oracle data is allowed to be before minting halts.
-     * @param newPeriod Seconds since last update allowed (0 disables the staleness check).
-     */
-    function setOracleStalePeriod(uint256 newPeriod) external;
-
-    /**
      * @notice Configure maximum circulating supply (0 disables enforcement).
      * @param newCap New max supply in wei.
      */
     function setSupplyCap(uint256 newCap) external;
-
-    /**
-     * @notice Read the latest scaled oracle rate (ETB per USD, 18 decimals).
-     */
-    function currentOracleRate() external view returns (uint256);
-
-    /**
-     * @notice Access the configured oracle feed contract.
-     */
-    function fxOracle() external view returns (IPriceFeed);
 
     /**
      * @notice Configure or update an authorized minter.

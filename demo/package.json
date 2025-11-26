@@ -10,6 +10,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@tolbel/sbirr": "0.0.8"
+    "@tolbel/sbirr": "0.0.13"
   }
 }

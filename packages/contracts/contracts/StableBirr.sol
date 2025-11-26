@@ -25,18 +25,13 @@ contract StableBirr is Initializable, UUPSUpgradeable, StableBirrOperations {
      * @notice Initialize the StableBirr proxy.
      * @param schnlAdmin_ Schnl Admin address.
      * @param schnlOperator_ Schnl Operator address.
-     * @param oracle Optional oracle address to configure immediately (use address(0) to skip).
      */
     function initialize(
         address schnlAdmin_,
-        address schnlOperator_,
-        address oracle
+        address schnlOperator_
     ) public initializer {
         __StableBirrBase_init(schnlAdmin_, schnlOperator_);
         __UUPSUpgradeable_init();
-        if (oracle != address(0)) {
-            _setFxOracle(oracle);
-        }
     }
 
     /**

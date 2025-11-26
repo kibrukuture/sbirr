@@ -92,60 +92,6 @@ export async function updateSchnlOperator(
 }
 
 /**
- * Swap the contract’s FX oracle reference.
- */
-export async function updateFxOracle(
-  contract: StableBirr,
-  signer: ethers.Signer,
-  params: UpdateOracleParams
-): Promise<ethers.TransactionResponse> {
-  try {
-    const tx = await contract
-      .connect(signer)
-      .updateFxOracle(params.oracle, params.options || {});
-    return tx;
-  } catch (error: unknown) {
-    throw new ContractError("Failed to update FX oracle", error);
-  }
-}
-
-/**
- * Set the operator/oracle deviation tolerance (basis points).
- */
-export async function setRateDeviationTolerance(
-  contract: StableBirr,
-  signer: ethers.Signer,
-  params: SetRateToleranceParams
-): Promise<ethers.TransactionResponse> {
-  try {
-    const tx = await contract
-      .connect(signer)
-      .setRateDeviationTolerance(params.toleranceBps, params.options || {});
-    return tx;
-  } catch (error: unknown) {
-    throw new ContractError("Failed to set rate tolerance", error);
-  }
-}
-
-/**
- * Configure how many seconds oracle data may remain valid before rejecting new mints.
- */
-export async function setOracleStalePeriod(
-  contract: StableBirr,
-  signer: ethers.Signer,
-  params: SetOracleStalePeriodParams
-): Promise<ethers.TransactionResponse> {
-  try {
-    const tx = await contract
-      .connect(signer)
-      .setOracleStalePeriod(params.periodSeconds, params.options || {});
-    return tx;
-  } catch (error: unknown) {
-    throw new ContractError("Failed to set oracle stale period", error);
-  }
-}
-
-/**
  * Update the circulating supply cap (pass "0" to disable the guard).
  */
 export async function setSupplyCap(

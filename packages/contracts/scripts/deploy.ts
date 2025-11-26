@@ -15,15 +15,10 @@ async function main() {
   // Deploy parameters
   const schnlAdmin = deployer.address; // For testing, use deployer as admin
   const schnlOperator = deployer.address; // For testing, use deployer as operator
-  const oracle = ethers.ZeroAddress; // No oracle for local testing
 
   console.log("Deploy parameters:");
   console.log("  Schnl Admin:", schnlAdmin);
   console.log("  Schnl Operator:", schnlOperator);
-  console.log(
-    "  Oracle:",
-    oracle === ethers.ZeroAddress ? "None (will set later)" : oracle
-  );
   console.log();
 
   // Deploy using UUPS proxy pattern
@@ -32,7 +27,7 @@ async function main() {
   console.log("⏳ Deploying proxy and implementation...");
   const stableBirr = await upgrades.deployProxy(
     StableBirr,
-    [schnlAdmin, schnlOperator, oracle],
+    [schnlAdmin, schnlOperator],
     {
       kind: "uups",
       initializer: "initialize",
