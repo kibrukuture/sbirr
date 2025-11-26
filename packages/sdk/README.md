@@ -1804,5 +1804,5 @@ MIT © Schnl (tolbel LLC)
 
 ## Support
 
-- **Documentation**: [https://github.com/kibrukuture/StableBirr](https://github.com/kibrukuture/StableBirr)
-- **Issues**: [GitHub Issues](https://github.com/kibrukuture/StableBirr/issues)
+- **Documentation**: [https://github.com/kibrukuture/sbirr](https://github.com/kibrukuture/sbirr)
+- **Issues**: [GitHub Issues](https://github.com/kibrukuture/sbirr/issues)
