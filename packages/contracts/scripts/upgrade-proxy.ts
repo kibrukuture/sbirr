@@ -9,11 +9,12 @@ import { ethers, upgrades } from "hardhat";
 async function main() {
   const [deployer] = await ethers.getSigners();
 
-  // OLD proxy address (the one you want to keep)
-  const PROXY_ADDRESS = "0xFaa6E8Ee77368613c804f51029CAb30677967F67";
+  const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
+
+  if (!CONTRACT_ADDRESS) throw new Error("CONTRACT_ADDRESS Not Available.");
 
   console.log("🔄 Upgrading StableBirr proxy...\n");
-  console.log("Proxy address:", PROXY_ADDRESS);
+  console.log("Proxy address:", CONTRACT_ADDRESS);
   console.log("Upgrading with account:", deployer.address);
   console.log(
     "Account balance:",
@@ -27,20 +28,20 @@ async function main() {
   console.log("⏳ Upgrading implementation...");
 
   // Upgrade the proxy to the new implementation
-  const upgraded = await upgrades.upgradeProxy(PROXY_ADDRESS, StableBirrV2);
+  const upgraded = await upgrades.upgradeProxy(CONTRACT_ADDRESS, StableBirrV2);
   await upgraded.waitForDeployment();
 
   const newImplementation = await upgrades.erc1967.getImplementationAddress(
-    PROXY_ADDRESS
+    CONTRACT_ADDRESS
   );
 
   console.log("✅ Upgrade complete!");
-  console.log("   Proxy address (unchanged):", PROXY_ADDRESS);
+  console.log("   Proxy address (unchanged):", CONTRACT_ADDRESS);
   console.log("   New implementation:", newImplementation);
 
   // Verify the upgrade worked
   console.log("\n🔍 Verifying upgrade...");
-  const contract = await ethers.getContractAt("StableBirr", PROXY_ADDRESS);
+  const contract = await ethers.getContractAt("StableBirr", CONTRACT_ADDRESS);
   const name = await contract.name();
   const symbol = await contract.symbol();
   const admin = await contract.schnlAdmin();
@@ -50,7 +51,7 @@ async function main() {
   console.log("   Admin:", admin);
 
   console.log("\n✨ Upgrade successful!");
-  console.log("\n📝 Your contract address is still:", PROXY_ADDRESS);
+  console.log("\n📝 Your contract address is still:", CONTRACT_ADDRESS);
   console.log("   (No need to update SDK or demo!)");
 }
 
