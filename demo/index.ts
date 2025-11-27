@@ -12,6 +12,7 @@ import { removeMinter } from "./funs/removeMinter";
 const sbirr = new StableBirr({
   network: "polygon",
   rpcUrl: process.env.ALCHEMY_RPC_URL!,
+  // rpcUrl: "https://polygon-rpc.com",
   privateKey: process.env.PRIVATE_KEY!,
   contractAddress: process.env.CONTRACT_ADDRESS!,
 });
@@ -22,23 +23,23 @@ async function main() {
   try {
     const testAccount = "0x0b44c56e29107b0964b3923f059ee64cc6d8041a";
 
-    // 2. Freeze the account (first time or already frozen)
-    console.log("\n=== Step 2: Freezing account ===");
-    try {
-      const freezeResult1 = await unblacklist(sbirr, testAccount);
-      console.log({ freeze1: freezeResult1 });
-    } catch (error) {
-      console.log("Freeze 1 error:", error);
-    }
+    // // 2. Freeze the account (first time or already frozen)
+    // console.log("\n=== Step 2: Freezing account ===");
+    // try {
+    //   const freezeResult1 = await unblacklist(sbirr, testAccount);
+    //   console.log({ freeze1: freezeResult1 });
+    // } catch (error) {
+    //   console.log("Freeze 1 error:", error);
+    // }
 
     // const wipeFrozenBalance = await sbirr.contract.wipeFrozenBalance({
     //   account: "0x0b44c56e29107b0964b3923f059ee64cc6d8041a",
     //   caseId: "MERCHANT_001",
     // });
     // console.log({ wipeFrozenBalance });
-    // // Test mint
-    // const mintResult = await mint(sbirr, recipient);
-    // console.log({ mint: mintResult });
+    // Test mint
+    const mintResult = await mint(sbirr, recipient);
+    console.log({ mint: mintResult });
     // check balance;
     // const balance = await sbirr.contract.getBalance(recipient);
     // console.log({ balance });

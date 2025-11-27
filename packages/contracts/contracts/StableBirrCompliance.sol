@@ -181,11 +181,43 @@ abstract contract StableBirrCompliance is StableBirrBase {
     }
 
     /**
-     * @dev Hook invoked before any transfer/mint/burn. Enforces blacklist + freeze status in addition
-     *      to the inherited pause checks. Centralizing the guard here guarantees that even low-level
-     *      ERC20 operations respect compliance constraints.
-     *      
-     *      Note: OpenZeppelin v5 uses _update instead of _beforeTokenTransfer.
+     * @dev Internal hook invoked before any token transfer, mint, or burn operation.
+     *      This is the central compliance enforcement point for all ERC20 token movements.
+     *
+     * **OpenZeppelin v5 Pattern:**
+     * In OpenZeppelin v5, `_update` replaces the older `_beforeTokenTransfer` hook. All token
+     * operations (transfer, mint, burn) ultimately call this function, making it the single
+     * source of truth for compliance checks.
+     *
+     * **Call Flow:**
+     * - `transfer(to, amount)` → `_transfer(from, to, amount)` → `_update(from, to, amount)`
+     * - `_mint(to, amount)` → `_update(address(0), to, amount)`
+     * - `_burn(from, amount)` → `_update(from, address(0), amount)`
+     *
+     * **Compliance Rules Enforced:**
+     * 1. **Pause Check**: All operations blocked when contract is paused
+     * 2. **Blacklist Check**: Blacklisted accounts cannot send or receive tokens
+     * 3. **Freeze Check (Critical Logic)**:
+     *    - Frozen accounts CANNOT transfer tokens to other addresses
+     *    - Frozen accounts CANNOT receive tokens (mints or transfers)
+     *    - Frozen accounts CAN be burned (to address(0)) by admin via `wipeFrozenBalance`
+     *
+     * **Why Allow Burns from Frozen Accounts?**
+     * When an account is frozen due to legal action, the admin must be able to seize/wipe
+     * the frozen balance via `wipeFrozenBalance`. This requires burning tokens from a frozen
+     * account. The logic `_frozen[from] && to != address(0)` achieves this:
+     * - If `to == address(0)` (burn): freeze check is bypassed → burn allowed
+     * - If `to != address(0)` (transfer): freeze check triggers → transfer blocked
+     *
+     * **Edge Cases Handled:**
+     * - Mint to frozen account: Blocked (line 212 checks `_frozen[to]`)
+     * - Burn from frozen account: Allowed (line 204 condition is false when `to == 0x0`)
+     * - Transfer from frozen to frozen: Blocked (line 204 triggers on sender)
+     * - Transfer from normal to frozen: Blocked (line 212 triggers on recipient)
+     *
+     * @param from Address tokens are transferred from (0x0 for mints)
+     * @param to Address tokens are transferred to (0x0 for burns)
+     * @param amount Number of tokens being moved
      */
     function _update(
         address from,
@@ -198,7 +230,12 @@ abstract contract StableBirrCompliance is StableBirrBase {
         // Check blacklist and freeze for sender (skip for minting from zero address)
         if (from != address(0)) {
             if (_blacklisted[from]) revert AccountBlacklisted(from);
-            if (_frozen[from]) revert AccountFrozenState(from);
+            
+            // Allow burns (to == address(0)) from frozen accounts for wipeFrozenBalance
+            // Block all other operations (transfers) from frozen accounts
+            if (_frozen[from] && to != address(0)) {
+                revert AccountFrozenState(from);
+            }
         }
         
         // Check blacklist and freeze for recipient (skip for burning to zero address)
